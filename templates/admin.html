@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tunnel Admin</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background: #f4f4f9; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
+        input, button { padding: 8px; margin: 5px 0; }
+        button { background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <h1>Tunnel Admin Dashboard</h1>
+    
+    <div class="card">
+        <h3>Manually Activate New User</h3>
+        <form action="/create-user" method="POST">
+            <input type="email" name="email" placeholder="User Email" required>
+            <input type="text" name="subdomain" placeholder="Requested Subdomain (e.g., myapp)" required>
+            <input type="number" name="tcp_port" placeholder="Assign Public TCP Port (e.g., 20000)">
+            <button type="submit">Generate Token & Activate (30 Days)</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <h3>Active Subscribers</h3>
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Email</th>
+                <th>Subdomain</th>
+                <th>Token (Secret)</th>
+                <th>Expires</th>
+                <th>Status</th>
+                <th>TCP Port</th>
+            </tr>
+            {{range .Users}}
+            <tr>
+                <td>{{.ID}}</td>
+                <td>{{.Email}}</td>
+                <td>{{.Subdomain}}.tun.robotservice.eu.org</td>
+                <td><code>{{.Token}}</code></td>
+                <td>{{.Expiration}}</td>
+                <td>{{if .IsActive}}✅ Active{{else}}❌ Expired{{end}}</td>
+                <td>{{if .TCPPort}}{{.TCPPort}}{{else}}None{{end}}</td>
+            </tr>
+            {{end}}
+        </table>
+    </div>
+</body>
+</html>

@@ -1,0 +1,13 @@
+# Database
+tunnel.db
+
+# Compiled Binaries
+downloads/
+*.exe
+tunnel-client-*
+
+# Logs
+*.log
+
+# OS generated files
+.DS_Store
