@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+	"strings"
 )
 
 type User struct {
@@ -21,6 +22,7 @@ type User struct {
 	TCPPort        int
 	BandwidthUsed  string 
 	BandwidthLimit string 
+	StatusHTML     template.HTML // NEW FIELD
 }
 
 func formatBytes(b int64) string {
@@ -56,6 +58,22 @@ func adminDashboardHandler(w http.ResponseWriter, r *http.Request) {
 			u.BandwidthLimit = "Unlimited"
 		} else {
 			u.BandwidthLimit = formatBytes(rawLimit)
+		}
+
+		// NEW: Calculate days left and set the color
+		// NEW: Strip out T and Z so Go can read the date properly
+		cleanExp := strings.Replace(u.Expiration, "T", " ", 1)
+		cleanExp = strings.Replace(cleanExp, "Z", "", 1)
+
+		expTime, _ := time.Parse("2006-01-02 15:04:05", cleanExp)
+		daysLeft := int(time.Until(expTime).Hours() / 24)
+
+		if !u.IsActive {
+			u.StatusHTML = template.HTML(`<span style="color: #dc3545; font-weight: bold;">Expired/Kicked</span>`)
+		} else if daysLeft <= 3 {
+			u.StatusHTML = template.HTML(fmt.Sprintf(`<span style="color: #ff8c00; font-weight: bold;">Expiring Soon (%d days)</span>`, daysLeft))
+		} else {
+			u.StatusHTML = template.HTML(`<span style="color: #28a745; font-weight: bold;">Active</span>`)
 		}
 		
 		users = append(users, u)

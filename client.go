@@ -8,6 +8,7 @@ import (
 	"log"
 	"net"
 	"time"
+	"strings" // Add this!
 
 	"github.com/hashicorp/yamux"
 )
@@ -51,6 +52,7 @@ func connectAndServe(token, server, targetPort, mode string) error {
 	}
 	defer conn.Close()
 
+	// Send Token AND Mode to the server
 	fmt.Fprintf(conn, "%s|%s\n", token, mode)
 
 	reader := bufio.NewReader(conn)
@@ -59,11 +61,22 @@ func connectAndServe(token, server, targetPort, mode string) error {
 		return fmt.Errorf("failed to read auth response: %v", err)
 	}
 
-	if response != "SUCCESS: Authenticated\n" {
+	// Clean up any stray newlines
+	response = strings.TrimSpace(response)
+
+	// We use HasPrefix now instead of an exact match, in case a warning is attached
+	if !strings.HasPrefix(response, "SUCCESS: Authenticated") {
 		return fmt.Errorf("auth failed: %s", response)
 	}
 
 	log.Println("Server: SUCCESS: Authenticated")
+	
+	// Check for a server warning attached to the response
+	parts := strings.Split(response, "|")
+	if len(parts) > 1 {
+		log.Printf("⚠️ SERVER MESSAGE: %s", strings.TrimSpace(parts[1]))
+	}
+
 	log.Printf("Routing %s traffic to localhost:%s", mode, targetPort)
 
 	session, err := yamux.Client(conn, nil)

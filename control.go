@@ -70,8 +70,22 @@ func handleControlConnection(conn net.Conn) {
 		return
 	}
 
-	conn.Write([]byte("SUCCESS: Authenticated\n"))
+	// Calculate days left for terminal warning
+	// NEW: Fix date parsing for the terminal warning
+	cleanExp := strings.Replace(expiration, "T", " ", 1)
+	cleanExp = strings.Replace(cleanExp, "Z", "", 1)
+	
+	expTime, _ := time.Parse("2006-01-02 15:04:05", cleanExp)
+	daysLeft := int(time.Until(expTime).Hours() / 24)
+
+	if daysLeft <= 3 {
+		conn.Write([]byte(fmt.Sprintf("SUCCESS: Authenticated|WARNING: Your token expires in %d days! Message support on WhatsApp to renew.\n", daysLeft)))
+	} else {
+		conn.Write([]byte("SUCCESS: Authenticated\n"))
+	}
+	
 	log.Printf("Client connected: %s (Mode: %s)", subdomain, mode)
+	
 
 	session, err := yamux.Server(conn, nil)
 	if err != nil {

@@ -58,8 +58,8 @@
             <td><code>{{.Token}}</code></td>
             <td><strong>{{.BandwidthUsed}}</strong> / {{.BandwidthLimit}}</td>
             <td>{{.Expiration}}</td>
-            <td class="{{if .IsActive}}status-active{{else}}status-inactive{{end}}">
-                {{if .IsActive}}Active{{else}}Expired/Kicked{{end}}
+            <td>
+                {{.StatusHTML}}
             </td>
             <td>
                 <form action="/renew-user" method="POST" style="margin: 0;">
