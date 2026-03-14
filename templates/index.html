@@ -3,62 +3,99 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GoTunnel Pro | Secure Localhost Exposure</title>
+    <title>GoTunnel Pro | Secure Localhost Tunnels</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background: #0f172a; color: white; text-align: center; }
-        .hero { padding: 100px 20px; }
-        h1 { font-size: 3rem; margin-bottom: 10px; color: #38bdf8; }
-        p { font-size: 1.2rem; color: #cbd5e1; max-width: 600px; margin: 0 auto 30px; line-height: 1.6; }
-        .btn { background: #38bdf8; color: #0f172a; padding: 15px 30px; text-decoration: none; font-weight: bold; border-radius: 5px; font-size: 1.1rem; transition: background 0.3s; }
-        .btn:hover { background: #0284c7; color: white; }
-        .features { display: flex; justify-content: center; gap: 20px; padding: 50px 20px; flex-wrap: wrap; }
-        .card { background: #1e293b; padding: 30px; border-radius: 8px; width: 300px; text-align: left; }
-        .card h3 { color: #38bdf8; margin-top: 0; }
-        code { background: #000; padding: 5px 10px; border-radius: 4px; color: #10b981; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; background-color: #f8f9fa; color: #333; line-height: 1.6; }
+        .header { background-color: #1a1a1a; color: white; padding: 60px 20px; text-align: center; }
+        .header h1 { margin: 0; font-size: 2.5rem; }
+        .header p { font-size: 1.2rem; color: #aaa; max-width: 600px; margin: 15px auto; }
+        .container { max-width: 1000px; margin: 40px auto; padding: 0 20px; }
+        .features { display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 50px; }
+        .feature-box { flex: 1; min-width: 250px; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-top: 4px solid #007bff; }
+        .pricing { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
+        .tier { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 300px; text-align: center; position: relative; }
+        .tier.pro { border: 2px solid #28a745; transform: scale(1.05); }
+        .tier h3 { margin-top: 0; color: #007bff; }
+        .tier.pro h3 { color: #28a745; }
+        .price { font-size: 2rem; font-weight: bold; margin: 20px 0; }
+        .limitations { text-align: left; margin: 20px 0; padding: 0; list-style: none; }
+        .limitations li { margin-bottom: 10px; padding-left: 25px; position: relative; font-size: 0.95rem; }
+        .limitations li::before { content: "✓"; color: #28a745; position: absolute; left: 0; font-weight: bold; }
+        .limit-warning { background-color: #fff3cd; color: #856404; padding: 15px; border-radius: 5px; margin-top: 40px; text-align: center; border: 1px solid #ffeeba; }
+        .cta-section { text-align: center; margin: 50px 0; padding: 40px; background: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .cta-button { display: inline-block; background-color: #25D366; color: white; text-decoration: none; padding: 15px 30px; font-size: 1.2rem; border-radius: 50px; font-weight: bold; margin-top: 20px; }
+        code { background: #eee; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; }
     </style>
 </head>
 <body>
-    <div class="hero">
-        <h1>Expose Localhost to the World.</h1>
-        <p>Securely route public traffic to your local web apps, Minecraft servers, and APIs without messing with your router or firewall.</p>
-        <a href="#pricing" class="btn">Get Your Access Token</a>
+
+    <div class="header">
+        <h1>GoTunnel Pro</h1>
+        <p>Bypass NAT and firewalls. Securely expose your local apps, APIs, and game servers to the public internet in seconds.</p>
     </div>
 
-    <div class="features">
-        <div class="card">
-            <h3>🌍 Custom Subdomains</h3>
-            <p>Get your own dedicated public URL like <code>yourapp.tun.robotservice.eu.org</code> secured with automatic HTTPS.</p>
-        </div>
-        <div class="card">
-            <h3>⚡ TCP & UDP Support</h3>
-            <p>Not just for web servers. Expose SSH, databases, and game servers securely.</p>
-        </div>
-        <div class="card">
-            <h3>🚀 Zero Dependencies</h3>
-            <p>Just download our single lightweight binary and run:</p>
-            <p><code>./tunnel-client --token XYZ --local 8000</code></p>
-        </div>
-    </div>
-
-   <div id="pricing" style="padding: 50px 20px; background: #1e293b;">
-        <h2>Simple Pricing</h2>
-        <p>We process payments directly via secure Bank Transfer (IMPS/NEFT) or UPI.</p>
-        <p style="font-size: 1.5rem; color: #38bdf8; font-weight: bold;">₹99 / month</p>
+    <div class="container">
         
-        <div style="background: #0f172a; padding: 20px; border-radius: 8px; display: inline-block; text-align: left; margin-bottom: 20px; border: 1px solid #38bdf8;">
-            <p style="margin: 5px 0; color: #cbd5e1;"><strong>Bank:</strong> Kotak Mahindra Bank</p>
-            <p style="margin: 5px 0; color: #cbd5e1;"><strong>Account Name:</strong> Murtaza Gandhi</p>
-            <p style="margin: 5px 0; color: #cbd5e1;"><strong>Account Number:</strong> 7750081372</p>
-            <p style="margin: 5px 0; color: #cbd5e1;"><strong>IFSC Code:</strong> KKBK0002581</p>
-            <br>
-            <p style="margin: 5px 0; color: #cbd5e1;"><strong>UPI ID:</strong> 7567365118@kotak811</p>
+        <div class="features">
+            <div class="feature-box">
+                <h3>🌐 Stable Custom Subdomains</h3>
+                <p>No more randomly generated URLs that change every 2 hours. Get a permanent <code>you.tun.robotservice.eu.org</code> address.</p>
+            </div>
+            <div class="feature-box">
+                <h3>🔌 Raw TCP Support</h3>
+                <p>Need to expose a Minecraft server, SSH, or MySQL database? We provide dedicated public ports for raw data streams.</p>
+            </div>
+            <div class="feature-box">
+                <h3>⚡ Zero Installation</h3>
+                <p>Just download our lightweight 10MB executable for Windows, Mac, or Linux. Run a single command and you are online.</p>
+            </div>
         </div>
 
-        <p>After transferring, please email your <strong>Transaction ID</strong> and <strong>Requested Subdomain</strong> to:</p>
-        <p style="font-size: 1.2rem; font-weight: bold;">
-            <a href="mailto:murtaza.i.gandhi@gmail.com" style="color: #38bdf8; text-decoration: none;">murtaza.i.gandhi@gmail.com</a>
-        </p>
-        <p style="font-size: 0.9rem; color: #94a3b8;">We will verify the payment and email your secure Access Token within 12 hours.</p>
+        <h2 style="text-align: center; margin-bottom: 30px;">Choose Your Plan</h2>
+        
+        <div class="pricing">
+            <div class="tier">
+                <h3>Web Developer</h3>
+                <div class="price">₹99 <span style="font-size: 1rem; color: #777; font-weight: normal;">/ 30 Days</span></div>
+                <p>Perfect for testing webhooks, APIs, and React apps.</p>
+                <ul class="limitations">
+                    <li>1 Custom Subdomain</li>
+                    <li>HTTP / HTTPS Routing</li>
+                    <li><strong>50 GB</strong> Bandwidth Limit</li>
+                    <li>Auto-Reconnect Client</li>
+                    <li style="color: #dc3545;"><i>No TCP Port Access</i></li>
+                </ul>
+            </div>
+
+            <div class="tier pro">
+                <div style="background: #28a745; color: white; font-size: 0.8rem; font-weight: bold; padding: 5px; position: absolute; top: 0; left: 0; right: 0; border-radius: 6px 6px 0 0;">MOST POPULAR</div>
+                <br>
+                <h3>Pro IT & Gaming</h3>
+                <div class="price">₹199 <span style="font-size: 1rem; color: #777; font-weight: normal;">/ 30 Days</span></div>
+                <p>For Minecraft servers, SSH, databases, and heavy workloads.</p>
+                <ul class="limitations">
+                    <li>1 Custom Subdomain</li>
+                    <li>HTTP / HTTPS Routing</li>
+                    <li><strong>1 Dedicated TCP Port</strong></li>
+                    <li><strong>50 GB</strong> Bandwidth Limit</li>
+                    <li>Auto-Reconnect Client</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="limit-warning">
+            <strong>Transparency Notice:</strong> To ensure fast speeds for everyone, all plans are strictly capped at <strong>50 GB of data transfer per month</strong>. If you hit your limit early, the connection will pause until you purchase a data top-up or renew your 30-day cycle.
+        </div>
+
+        <div class="cta-section">
+            <h2>Ready to get online?</h2>
+            <p>We handle all activations manually to prevent network abuse. To get your access token and download link, simply reach out to me with your preferred plan and the subdomain name you want.</p>
+            
+            <a href="https://wa.me/917567365118?text=Hi!%20I%20would%20like%20to%20buy%20a%20GoTunnel%20subscription." class="cta-button">Message on WhatsApp</a>
+            <p style="margin-top: 15px; font-size: 0.9rem; color: #666;">Or email me at: <strong>murtaza.i.gandhi@gmail.com</strong></p>
+        </div>
+
     </div>
+
 </body>
 </html>
