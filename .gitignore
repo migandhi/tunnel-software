@@ -10,4 +10,4 @@ tunnel-client-*
 *.log
 
 # OS generated files
-.DS_Store
+.DS_Storetunnel-server

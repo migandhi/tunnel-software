@@ -1,56 +1,78 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tunnel Admin</title>
+    <title>GoTunnel Admin</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 40px; background: #f4f4f9; }
-        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
-        input, button { padding: 8px; margin: 5px 0; }
-        button { background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
-        button:hover { background: #0056b3; }
+        table { border-collapse: collapse; width: 100%; background: white; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background-color: #007bff; color: white; }
+        .form-box { background: white; padding: 20px; border-radius: 8px; border: 1px solid #ddd; }
+        input, select, button { padding: 10px; margin: 5px 0; }
+        button { background-color: #28a745; color: white; border: none; cursor: pointer; }
+        .status-active { color: green; font-weight: bold; }
+        .status-inactive { color: red; font-weight: bold; }
     </style>
 </head>
 <body>
-    <h1>Tunnel Admin Dashboard</h1>
+    <h1>GoTunnel Pro - Admin Dashboard</h1>
     
-    <div class="card">
-        <h3>Manually Activate New User</h3>
+    <div class="form-box">
+        <h3>Create New Subscription (30 Days)</h3>
         <form action="/create-user" method="POST">
-            <input type="email" name="email" placeholder="User Email" required>
-            <input type="text" name="subdomain" placeholder="Requested Subdomain (e.g., myapp)" required>
-            <input type="number" name="tcp_port" placeholder="Assign Public TCP Port (e.g., 20000)">
-            <button type="submit">Generate Token & Activate (30 Days)</button>
+            <input type="email" name="email" placeholder="Customer Email" required>
+            <input type="text" name="subdomain" placeholder="Requested Subdomain" required>
+            <input type="number" name="tcp_port" placeholder="Assign TCP Port (Optional)">
+            
+            <select name="bandwidth_limit" required>
+                <option value="50">50 GB Limit</option>
+                <option value="100">100 GB Limit</option>
+                <option value="500">500 GB Limit</option>
+                <option value="0">Unlimited (Bypass Enforcer)</option>
+            </select>
+            
+            <button type="submit">Generate Token & Activate</button>
         </form>
     </div>
 
-    <div class="card">
-        <h3>Active Subscribers</h3>
-        <table>
-            <tr>
-                <th>ID</th>
-                <th>Email</th>
-                <th>Subdomain</th>
-                <th>Token (Secret)</th>
-                <th>Expires</th>
-                <th>Status</th>
-                <th>TCP Port</th>
-            </tr>
-            {{range .Users}}
-            <tr>
-                <td>{{.ID}}</td>
-                <td>{{.Email}}</td>
-                <td>{{.Subdomain}}.tun.robotservice.eu.org</td>
-                <td><code>{{.Token}}</code></td>
-                <td>{{.Expiration}}</td>
-                <td>{{if .IsActive}}✅ Active{{else}}❌ Expired{{end}}</td>
-                <td>{{if .TCPPort}}{{.TCPPort}}{{else}}None{{end}}</td>
-            </tr>
-            {{end}}
-        </table>
-    </div>
+    <h3>Active Tunnels</h3>
+    <table>
+        <tr>
+            <th>Email</th>
+            <th>Subdomain</th>
+            <th>Public URL / Port</th>
+            <th>Token</th>
+            <th>Bandwidth (Used / Limit)</th>
+            <th>Expires On</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+        {{range .Users}}
+        <tr>
+            <td>{{.Email}}</td>
+            <td>{{.Subdomain}}</td>
+            <td>
+                https://{{.Subdomain}}.tun.robotservice.eu.org<br>
+                {{if .TCPPort}}<small>TCP Port: {{.TCPPort}}</small>{{end}}
+            </td>
+            <td><code>{{.Token}}</code></td>
+            <td><strong>{{.BandwidthUsed}}</strong> / {{.BandwidthLimit}}</td>
+            <td>{{.Expiration}}</td>
+            <td class="{{if .IsActive}}status-active{{else}}status-inactive{{end}}">
+                {{if .IsActive}}Active{{else}}Expired/Kicked{{end}}
+            </td>
+            <td>
+                <form action="/renew-user" method="POST" style="margin: 0;">
+                    <input type="hidden" name="subdomain" value="{{.Subdomain}}">
+                    <button type="submit" style="background-color: #ffc107; color: black; font-weight: bold; font-size: 12px; padding: 6px 10px;">Renew (30 Days)</button>
+                </form>
+                <form action="/delete-user" method="POST" style="display:inline-block; margin: 2px;" onsubmit="return confirm('Are you sure you want to permanently delete this user? This frees up their subdomain and TCP port, and cannot be undone.');">
+                    <input type="hidden" name="subdomain" value="{{.Subdomain}}">
+                    <button type="submit" style="background-color: #dc3545; color: white; border: none; cursor: pointer; font-weight: bold; font-size: 12px; padding: 6px 10px;">Delete</button>
+                </form>
+            </td>
+        </tr>
+        {{end}}
+    </table>
 </body>
 </html>
