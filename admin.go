@@ -19,11 +19,10 @@ type User struct {
 	Expiration     string
 	IsActive       bool
 	TCPPort        int
-	BandwidthUsed  string // Formatted for UI (e.g., "1.50 GB")
-	BandwidthLimit string // Formatted for UI (e.g., "50.00 GB" or "Unlimited")
+	BandwidthUsed  string 
+	BandwidthLimit string 
 }
 
-// formatBytes converts raw bytes into a readable string
 func formatBytes(b int64) string {
 	const unit = 1024
 	if b < unit {
@@ -78,14 +77,13 @@ func createUserHandler(w http.ResponseWriter, r *http.Request) {
 		tcpPort = "0"
 	}
 	
-	// Handle bandwidth limit selection
 	bwLimitStr := r.FormValue("bandwidth_limit")
 	var bandwidthLimit int64
 	if bwLimitStr == "0" {
-		bandwidthLimit = 0 // Unlimited
+		bandwidthLimit = 0 
 	} else {
 		gb, _ := strconv.ParseInt(bwLimitStr, 10, 64)
-		bandwidthLimit = gb * 1024 * 1024 * 1024 // Convert GB to Bytes
+		bandwidthLimit = gb * 1024 * 1024 * 1024 
 	}
 
 	token := generateToken()
@@ -101,7 +99,7 @@ func createUserHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func generateToken() string {
-	bytes := make([]byte, 8) // 16 hex characters
+	bytes := make([]byte, 8) 
 	rand.Read(bytes)
 	return hex.EncodeToString(bytes)
 }
@@ -110,19 +108,18 @@ func renewUserHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		return
 	}
-
 	subdomain := r.FormValue("subdomain")
-	
-	// Calculate new expiration date (30 days from right now)
 	newExpiration := time.Now().AddDate(0, 0, 30).Format("2006-01-02 15:04:05")
+	db.Exec(`UPDATE users SET expiration_timestamp = ?, is_active = 1, bandwidth_used = 0 WHERE subdomain = ?`, newExpiration, subdomain)
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
 
-	// Update the database: Extend time, set active, and reset bandwidth used
-	_, err := db.Exec(`UPDATE users SET expiration_timestamp = ?, is_active = 1, bandwidth_used = 0 WHERE subdomain = ?`, newExpiration, subdomain)
-	
-	if err != nil {
-		log.Printf("Error renewing user %s: %v", subdomain, err)
+func resetBandwidthHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		return
 	}
-	
+	subdomain := r.FormValue("subdomain")
+	db.Exec(`UPDATE users SET bandwidth_used = 0, is_active = 1 WHERE subdomain = ?`, subdomain)
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
@@ -130,24 +127,21 @@ func deleteUserHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		return
 	}
-
 	subdomain := r.FormValue("subdomain")
 
-	// 1. Instantly kill their active connection if they are online
 	tunnelMutex.Lock()
-	if session, exists := activeTunnels[subdomain]; exists {
-		log.Printf("ADMIN: Force disconnecting and deleting user %s", subdomain)
+	// Kill HTTP Session if it exists
+	if session, exists := activeHttpTunnels[subdomain]; exists {
 		session.Close()
-		delete(activeTunnels, subdomain)
+		delete(activeHttpTunnels, subdomain)
+	}
+	// Kill TCP Session if it exists
+	if session, exists := activeTcpTunnels[subdomain]; exists {
+		session.Close()
+		delete(activeTcpTunnels, subdomain)
 	}
 	tunnelMutex.Unlock()
 	
-	// 2. Permanently delete their record from the database
-	_, err := db.Exec(`DELETE FROM users WHERE subdomain = ?`, subdomain)
-	
-	if err != nil {
-		log.Printf("Error deleting user %s: %v", subdomain, err)
-	}
-	
+	db.Exec(`DELETE FROM users WHERE subdomain = ?`, subdomain)
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }

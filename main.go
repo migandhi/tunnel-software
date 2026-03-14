@@ -17,15 +17,16 @@ import (
 )
 
 var (
-	db            *sql.DB
-	activeTunnels = make(map[string]*yamux.Session)
-	tunnelMutex   sync.RWMutex
+	db                *sql.DB
+	activeHttpTunnels = make(map[string]*yamux.Session)
+	activeTcpTunnels  = make(map[string]*yamux.Session)
+	tunnelMutex       sync.RWMutex
 )
 
 // --- BANDWIDTH TRACKER ---
 var (
 	bwMutex sync.Mutex
-	bwUsage = make(map[string]int64) // Maps subdomain -> bytes used
+	bwUsage = make(map[string]int64) 
 )
 
 func addBytes(subdomain string, n int64) {
@@ -60,13 +61,12 @@ func (t *TrackingConn) Write(b []byte) (int, error) {
 func basicAuth(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		username, password, ok := r.BasicAuth()
-		// CHANGE THESE CREDENTIALS!
 		expectedUsername := "admin"
-		expectedPassword := "yahusein5253"
+		expectedPassword := "yahusein5253" // Your custom password
 
 		if !ok || username != expectedUsername || password != expectedPassword {
 			w.Header().Set("WWW-Authenticate", `Basic realm="Restricted Admin Area"`)
-			http.Error(w, "Unauthorized Access. Nice try!", http.StatusUnauthorized)
+			http.Error(w, "Unauthorized Access", http.StatusUnauthorized)
 			return
 		}
 		next(w, r)
@@ -81,7 +81,7 @@ func main() {
 	}
 	defer db.Close()
 
-	// Ensure tables exist with bandwidth columns
+	// Ensure tables exist
 	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS users (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		email TEXT,
@@ -97,16 +97,16 @@ func main() {
 		log.Fatalf("Failed to initialize database tables: %v", err)
 	}
 
-	// 1. Start the Control Server (Port 7000)
 	go startControlServer()
 
-	// 2. Start the Admin UI Server (Port 3050)
+	// Admin UI Server
 	go func() {
 		mux := http.NewServeMux()
 		mux.HandleFunc("/", basicAuth(adminDashboardHandler))
 		mux.HandleFunc("/create-user", basicAuth(createUserHandler))
-		mux.HandleFunc("/renew-user", basicAuth(renewUserHandler)) // <-- ADD THIS LINE
-		mux.HandleFunc("/delete-user", basicAuth(deleteUserHandler)) // <-- ADD THIS LINE
+		mux.HandleFunc("/renew-user", basicAuth(renewUserHandler))
+		mux.HandleFunc("/reset-bandwidth", basicAuth(resetBandwidthHandler))
+		mux.HandleFunc("/delete-user", basicAuth(deleteUserHandler))
 		mux.Handle("/downloads/", http.StripPrefix("/downloads/", http.FileServer(http.Dir("./downloads"))))
 		
 		log.Println("Starting Admin UI on port :3050...")
@@ -115,27 +115,25 @@ func main() {
 		}
 	}()
 
-	// 3. Start the HTTP Tunnel Proxy (Port 8080)
+	// HTTP Tunnel Proxy
 	go func() {
 		mux := http.NewServeMux()
 		mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-			// Serve Landing Page on the Root Domain
 			if r.Host == "tun.robotservice.eu.org" {
 				tmpl, err := template.ParseFiles("templates/index.html")
 				if err != nil {
-					http.Error(w, "Landing page under construction.", http.StatusInternalServerError)
+					http.Error(w, "Landing page error.", http.StatusInternalServerError)
 					return
 				}
 				tmpl.Execute(w, nil)
 				return
 			}
 
-			// Proxy Subdomains down the Tunnel
 			hostParts := strings.Split(r.Host, ".")
 			subdomain := hostParts[0]
 
 			tunnelMutex.RLock()
-			session, exists := activeTunnels[subdomain]
+			session, exists := activeHttpTunnels[subdomain] // Route only to HTTP sessions
 			tunnelMutex.RUnlock()
 
 			if !exists {
@@ -154,7 +152,6 @@ func main() {
 						if err != nil {
 							return nil, err
 						}
-						// Wrap the stream to count bytes
 						return &TrackingConn{Conn: stream, subdomain: subdomain}, nil
 					},
 				},
@@ -168,12 +165,11 @@ func main() {
 		}
 	}()
 
-	// 4. Background Enforcer & Bandwidth Sync (Runs every 10 seconds)
+	// Background Enforcer
 	for {
 		time.Sleep(10 * time.Second)
 		currentTime := time.Now().Format("2006-01-02 15:04:05")
 
-		// A. Sync Bandwidth to Database
 		bwMutex.Lock()
 		for sub, bytes := range bwUsage {
 			if bytes > 0 {
@@ -183,7 +179,6 @@ func main() {
 		}
 		bwMutex.Unlock()
 
-		// B. Enforce Limits (Kick expired OR over-limit users)
 		rows, err := db.Query(`SELECT subdomain FROM users 
 			WHERE is_active = 1 AND 
 			(expiration_timestamp <= ? OR (bandwidth_limit > 0 AND bandwidth_used >= bandwidth_limit))`, currentTime)
@@ -194,10 +189,15 @@ func main() {
 				rows.Scan(&sub)
 				
 				tunnelMutex.Lock()
-				if session, exists := activeTunnels[sub]; exists {
-					log.Printf("ENFORCER: Disconnecting %s (Expired or Out of Bandwidth)", sub)
+				// Kill HTTP Session if active
+				if session, exists := activeHttpTunnels[sub]; exists {
 					session.Close()
-					delete(activeTunnels, sub)
+					delete(activeHttpTunnels, sub)
+				}
+				// Kill TCP Session if active
+				if session, exists := activeTcpTunnels[sub]; exists {
+					session.Close()
+					delete(activeTcpTunnels, sub)
 				}
 				tunnelMutex.Unlock()
 				

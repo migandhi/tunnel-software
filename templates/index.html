@@ -12,6 +12,11 @@
         .container { max-width: 1000px; margin: 40px auto; padding: 0 20px; }
         .features { display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 50px; }
         .feature-box { flex: 1; min-width: 250px; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-top: 4px solid #007bff; }
+        
+        /* Terminal Style Block */
+        .terminal-box { background: #1e1e1e; color: #56db3a; padding: 20px; border-radius: 8px; font-family: monospace; margin: 30px 0; overflow-x: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .terminal-box span.comment { color: #888; }
+        
         .pricing { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
         .tier { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 300px; text-align: center; position: relative; }
         .tier.pro { border: 2px solid #28a745; transform: scale(1.05); }
@@ -24,7 +29,7 @@
         .limit-warning { background-color: #fff3cd; color: #856404; padding: 15px; border-radius: 5px; margin-top: 40px; text-align: center; border: 1px solid #ffeeba; }
         .cta-section { text-align: center; margin: 50px 0; padding: 40px; background: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         .cta-button { display: inline-block; background-color: #25D366; color: white; text-decoration: none; padding: 15px 30px; font-size: 1.2rem; border-radius: 50px; font-weight: bold; margin-top: 20px; }
-        code { background: #eee; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; }
+        code { background: #eee; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; color: #333;}
     </style>
 </head>
 <body>
@@ -47,11 +52,22 @@
             </div>
             <div class="feature-box">
                 <h3>⚡ Zero Installation</h3>
-                <p>Just download our lightweight 10MB executable for Windows, Mac, or Linux. Run a single command and you are online.</p>
+                <p>Just download our lightweight executable for Windows, Mac, or Linux. Run a single command and you are online.</p>
             </div>
         </div>
 
-        <h2 style="text-align: center; margin-bottom: 30px;">Choose Your Plan</h2>
+        <h2 style="text-align: center;">How It Works</h2>
+        <div class="terminal-box">
+            <span class="comment"># 1. To expose a local web app or API (Available on all plans)</span><br>
+            ./tunnel-client --token YOUR_TOKEN --local-http 8000<br><br>
+            
+            <span class="comment"># 2. To expose a game server or database (Requires Pro Plan)</span><br>
+            ./tunnel-client --token YOUR_TOKEN --local-tcp 25565<br><br>
+            
+            <span class="comment"># Pro Tip: You can run both commands in separate terminal windows at the same time!</span>
+        </div>
+
+        <h2 style="text-align: center; margin-top: 50px; margin-bottom: 30px;">Choose Your Plan</h2>
         
         <div class="pricing">
             <div class="tier">
