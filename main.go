@@ -75,7 +75,7 @@ func basicAuth(next http.HandlerFunc) http.HandlerFunc {
 
 func main() {
 	var err error
-	db, err = sql.Open("sqlite3", "./tunnel.db")
+	db, err = sql.Open("sqlite3", "tunnel.db?_busy_timeout=5000")
 	if err != nil {
 		log.Fatalf("Failed to open database: %v", err)
 	}
