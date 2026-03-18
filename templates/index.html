@@ -5,113 +5,188 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GoTunnel Pro | Secure Localhost Tunnels</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; background-color: #f8f9fa; color: #333; line-height: 1.6; }
-        .header { background-color: #1a1a1a; color: white; padding: 60px 20px; text-align: center; }
-        .header h1 { margin: 0; font-size: 2.5rem; }
-        .header p { font-size: 1.2rem; color: #aaa; max-width: 600px; margin: 15px auto; }
-        .container { max-width: 1000px; margin: 40px auto; padding: 0 20px; }
-        .features { display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 50px; }
-        .feature-box { flex: 1; min-width: 250px; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-top: 4px solid #007bff; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f4f7f6; color: #333; margin: 0; padding: 0; }
+        .hero { background-color: #1a1a2e; color: #fff; padding: 60px 20px; text-align: center; }
+        .hero h1 { margin: 0; font-size: 2.5em; color: #4facfe; }
+        .hero p { font-size: 1.2em; color: #d1d1e9; max-width: 600px; margin: 15px auto; line-height: 1.5; }
+        .container { max-width: 900px; margin: 40px auto; padding: 0 20px; }
         
-        /* Terminal Style Block */
-        .terminal-box { background: #1e1e1e; color: #56db3a; padding: 20px; border-radius: 8px; font-family: monospace; margin: 30px 0; overflow-x: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .terminal-box span.comment { color: #888; }
+        /* Checkout Box Styles */
+        .checkout-box { background: #fff; border-radius: 12px; padding: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); max-width: 500px; margin: 0 auto; text-align: center; }
+        .checkout-box h2 { margin-top: 0; color: #1a1a2e; }
+        .checkout-box p { color: #666; font-size: 14px; margin-bottom: 20px; }
+        .input-group { margin-bottom: 15px; text-align: left; }
+        .input-group label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 5px; color: #444; }
+        .input-group input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 14px; }
         
-        .pricing { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
-        .tier { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 300px; text-align: center; position: relative; }
-        .tier.pro { border: 2px solid #28a745; transform: scale(1.05); }
-        .tier h3 { margin-top: 0; color: #007bff; }
-        .tier.pro h3 { color: #28a745; }
-        .price { font-size: 2rem; font-weight: bold; margin: 20px 0; }
-        .limitations { text-align: left; margin: 20px 0; padding: 0; list-style: none; }
-        .limitations li { margin-bottom: 10px; padding-left: 25px; position: relative; font-size: 0.95rem; }
-        .limitations li::before { content: "✓"; color: #28a745; position: absolute; left: 0; font-weight: bold; }
-        .limit-warning { background-color: #fff3cd; color: #856404; padding: 15px; border-radius: 5px; margin-top: 40px; text-align: center; border: 1px solid #ffeeba; }
-        .cta-section { text-align: center; margin: 50px 0; padding: 40px; background: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .cta-button { display: inline-block; background-color: #25D366; color: white; text-decoration: none; padding: 15px 30px; font-size: 1.2rem; border-radius: 50px; font-weight: bold; margin-top: 20px; }
-        code { background: #eee; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; color: #333;}
+        /* Buttons */
+        .btn-basic { background: #28a745; color: white; width: 100%; padding: 14px; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; margin-bottom: 15px; transition: background 0.2s; }
+        .btn-basic:hover { background: #218838; }
+        .btn-pro { background: #007bff; color: white; width: 100%; padding: 14px; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; margin-bottom: 15px; transition: background 0.2s; }
+        .btn-pro:hover { background: #0069d9; }
+        
+        /* Success Screen */
+        .success-box { display: none; background: #d4edda; border: 2px solid #28a745; border-radius: 12px; padding: 30px; max-width: 600px; margin: 0 auto; color: #155724; }
+        .success-box h2 { margin-top: 0; color: #155724; text-align: center; }
+        .credentials-list { list-style: none; padding: 0; font-size: 16px; background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #c3e6cb; }
+        .credentials-list li { margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .credentials-list li:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .code-block { background: #1a1a2e; color: #4facfe; padding: 12px; border-radius: 6px; font-family: monospace; display: block; margin-top: 10px; word-break: break-all; }
+        .highlight { font-weight: bold; color: #d9534f; }
     </style>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </head>
 <body>
 
-    <div class="header">
+    <div class="hero">
         <h1>GoTunnel Pro</h1>
-        <p>Bypass NAT and firewalls. Securely expose your local apps, APIs, and game servers to the public internet in seconds.</p>
+        <p>Bypass CGNAT. Instantly expose your local web apps, AI tools, and TCP game servers to the public internet.</p>
     </div>
 
     <div class="container">
         
-        <div class="features">
-            <div class="feature-box">
-                <h3>🌐 Stable Custom Subdomains</h3>
-                <p>No more randomly generated URLs that change every 2 hours. Get a permanent <code>you.tun.robotservice.eu.org</code> address.</p>
-            </div>
-            <div class="feature-box">
-                <h3>🔌 Raw TCP Support</h3>
-                <p>Need to expose a Minecraft server, SSH, or MySQL database? We provide dedicated public ports for raw data streams.</p>
-            </div>
-            <div class="feature-box">
-                <h3>⚡ Zero Installation</h3>
-                <p>Just download our lightweight executable for Windows, Mac, or Linux. Run a single command and you are online.</p>
-            </div>
-        </div>
-
-        <h2 style="text-align: center;">How It Works</h2>
-        <div class="terminal-box">
-            <span class="comment"># 1. To expose a local web app or API (Available on all plans)</span><br>
-            ./tunnel-client --token YOUR_TOKEN --local-http 8000<br><br>
+        <div id="automated-checkout-box" class="checkout-box">
+            <h2>Instant Automated Setup</h2>
+            <p>Enter your details below to get your secure tunnel credentials instantly.</p>
             
-            <span class="comment"># 2. To expose a game server or database (Requires Pro Plan)</span><br>
-            ./tunnel-client --token YOUR_TOKEN --local-tcp 25565<br><br>
-            
-            <span class="comment"># Pro Tip: You can run both commands in separate terminal windows at the same time!</span>
-        </div>
-
-        <h2 style="text-align: center; margin-top: 50px; margin-bottom: 30px;">Choose Your Plan</h2>
-        
-        <div class="pricing">
-            <div class="tier">
-                <h3>Web Developer</h3>
-                <div class="price">₹99 <span style="font-size: 1rem; color: #777; font-weight: normal;">/ 30 Days</span></div>
-                <p>Perfect for testing webhooks, APIs, and React apps.</p>
-                <ul class="limitations">
-                    <li>1 Custom Subdomain</li>
-                    <li>HTTP / HTTPS Routing</li>
-                    <li><strong>50 GB</strong> Bandwidth Limit</li>
-                    <li>Auto-Reconnect Client</li>
-                    <li style="color: #dc3545;"><i>No TCP Port Access</i></li>
-                </ul>
+            <div class="input-group">
+                <label for="customer-email">Email Address</label>
+                <input type="email" id="customer-email" placeholder="you@example.com" required>
             </div>
-
-            <div class="tier pro">
-                <div style="background: #28a745; color: white; font-size: 0.8rem; font-weight: bold; padding: 5px; position: absolute; top: 0; left: 0; right: 0; border-radius: 6px 6px 0 0;">MOST POPULAR</div>
-                <br>
-                <h3>Pro IT & Gaming</h3>
-                <div class="price">₹199 <span style="font-size: 1rem; color: #777; font-weight: normal;">/ 30 Days</span></div>
-                <p>For Minecraft servers, SSH, databases, and heavy workloads.</p>
-                <ul class="limitations">
-                    <li>1 Custom Subdomain</li>
-                    <li>HTTP / HTTPS Routing</li>
-                    <li><strong>1 Dedicated TCP Port</strong></li>
-                    <li><strong>50 GB</strong> Bandwidth Limit</li>
-                    <li>Auto-Reconnect Client</li>
-                </ul>
-            </div>
-        </div>
-
-        <div class="limit-warning">
-            <strong>Transparency Notice:</strong> To ensure fast speeds for everyone, all plans are strictly capped at <strong>50 GB of data transfer per month</strong>. If you hit your limit early, the connection will pause until you purchase a data top-up or renew your 30-day cycle.
-        </div>
-
-        <div class="cta-section">
-            <h2>Ready to get online?</h2>
-            <p>We handle all activations manually to prevent network abuse. To get your access token and download link, simply reach out to me with your preferred plan and the subdomain name you want.</p>
             
-            <a href="https://wa.me/917567365118?text=Hi!%20I%20would%20like%20to%20buy%20a%20GoTunnel%20subscription." class="cta-button">Message on WhatsApp</a>
-            <p style="margin-top: 15px; font-size: 0.9rem; color: #666;">Or email me at: <strong>murtaza.i.gandhi@gmail.com</strong></p>
+            <div class="input-group">
+                <label for="customer-subdomain">Desired Subdomain</label>
+                <input type="text" id="customer-subdomain" placeholder="e.g. myapp (becomes myapp.tun.robotservice.eu.org)" required>
+            </div>
+            
+            <button class="btn-basic" onclick="startCheckout('basic')">
+                Buy Web Developer Plan (₹99 / 30 Days)<br>
+                <span style="font-size: 12px; font-weight: normal;">HTTP/HTTPS + 50 GB Bandwidth</span>
+            </button>
+            
+            <button class="btn-pro" onclick="startCheckout('pro')">
+                Buy Pro IT & Gaming Plan (₹199 / 30 Days)<br>
+                <span style="font-size: 12px; font-weight: normal;">HTTP/HTTPS + 1 Dedicated TCP Port + Unlimited</span>
+            </button>
+
+            <p style="margin-top: 20px; font-size: 13px;">
+                Or <a href="https://wa.me/917567365118?text=Hi Murtaza, I want to buy a GoTunnel plan manually." target="_blank" style="color: #007bff; text-decoration: none; font-weight: bold;">Chat on WhatsApp to pay manually</a>.
+            </p>
+        </div>
+
+        <div id="success-screen" class="success-box">
+            <h2>🎉 Payment Successful!</h2>
+            <p style="text-align: center; margin-bottom: 20px;">Your GoTunnel is ready. Please copy and save these details immediately:</p>
+            
+            <ul class="credentials-list">
+                <li><b>Secure Token:</b> <span id="out-token" style="font-family: monospace; font-size: 1.1em; font-weight: bold;"></span></li>
+                <li><b>Public Web URL:</b> <b>https://<span id="out-subdomain" class="highlight"></span>.tun.robotservice.eu.org</b></li>
+                <li><b>Assigned TCP Port:</b> <span id="out-port" class="highlight"></span></li>
+            </ul>
+            
+            <p style="margin-top: 20px; font-weight: bold;">How to start your HTTP web tunnel:</p>
+            <span class="code-block">tunnel-client.exe --token <span id="out-token-cmd-http"></span> --local-http 8000</span>
+            
+            <div id="tcp-instructions" style="display: none;">
+                <p style="margin-top: 15px; font-weight: bold;">How to start your TCP tunnel (Games, SSH, Databases):</p>
+                <span class="code-block">tunnel-client.exe --token <span id="out-token-cmd-tcp"></span> --local-tcp 25565</span>
+                <p style="margin-top: 5px; font-size: 13px; color: #555;">(The public will connect to your server at: <b>tun.robotservice.eu.org:<span id="out-public-port"></span></b>)</p>
+            </div>
+            
+            <p style="margin-top: 15px; font-size: 13px; color: #555;">(Download the client from <a href="/downloads/">here</a> if you haven't already. Replace 8000/25565 with your local application's port).</p>
         </div>
 
     </div>
 
+    <script>
+    async function startCheckout(plan) {
+        const email = document.getElementById('customer-email').value;
+        const sub = document.getElementById('customer-subdomain').value;
+        
+        if (!email || !sub) {
+            alert("Please enter both your email address and a desired subdomain.");
+            return;
+        }
+
+        const buttons = document.querySelectorAll('button');
+        buttons.forEach(b => b.disabled = true);
+
+        try {
+            const orderRes = await fetch('/api/create-order', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ plan: plan, email: email, requested_subdomain: sub })
+            });
+            const order = await orderRes.json();
+
+            var options = {
+                "key": "rzp_test_SSdvB4Ueqi8GYZ", // <--- PASTE YOUR TEST KEY ID HERE!!!
+                "amount": order.amount,
+                "currency": "INR",
+                "name": "GoTunnel Pro",
+                "description": plan === 'pro' ? "Pro IT & Gaming Plan (30 Days)" : "Web Developer Plan (30 Days)",
+                "order_id": order.id,
+                "handler": async function (response) {
+                    
+                    const verifyRes = await fetch('/api/verify-payment', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            razorpay_order_id: response.razorpay_order_id,
+                            razorpay_payment_id: response.razorpay_payment_id,
+                            razorpay_signature: response.razorpay_signature,
+                            plan: plan,
+                            email: email,
+                            requested_subdomain: sub
+                        })
+                    });
+                    
+                    const result = await verifyRes.json();
+                    
+                    if (result.status === "success") {
+                        document.getElementById('automated-checkout-box').style.display = 'none';
+                        document.getElementById('success-screen').style.display = 'block';
+                        
+                        document.getElementById('out-token').innerText = result.token;
+                        document.getElementById('out-token-cmd-http').innerText = result.token;
+                        document.getElementById('out-subdomain').innerText = result.subdomain;
+                        
+                        // Check if they got a TCP Port, show the instructions if they did
+                        if (result.tcp_port > 0) {
+                            document.getElementById('out-port').innerText = result.tcp_port;
+                            document.getElementById('out-public-port').innerText = result.tcp_port;
+                            document.getElementById('out-token-cmd-tcp').innerText = result.token;
+                            document.getElementById('tcp-instructions').style.display = 'block';
+                        } else {
+                            document.getElementById('out-port').innerText = "N/A (Web Plan Only)";
+                            document.getElementById('tcp-instructions').style.display = 'none';
+                        }
+
+                    } else {
+                        alert("Payment verification failed! Please contact support.");
+                    }
+                },
+                "prefill": { "email": email },
+                "theme": { "color": "#1a1a2e" },
+                "modal": {
+                    "ondismiss": function(){
+                        buttons.forEach(b => b.disabled = false);
+                    }
+                }
+            };
+            
+            var rzp1 = new Razorpay(options);
+            rzp1.on('payment.failed', function (response){
+                alert("Payment Failed. Reason: " + response.error.description);
+                buttons.forEach(b => b.disabled = false);
+            });
+            rzp1.open();
+
+        } catch (err) {
+            alert("Error connecting to server. Please try again later.");
+            buttons.forEach(b => b.disabled = false);
+        }
+    }
+    </script>
 </body>
 </html>

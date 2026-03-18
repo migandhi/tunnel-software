@@ -26,7 +26,7 @@ var (
 // --- BANDWIDTH TRACKER ---
 var (
 	bwMutex sync.Mutex
-	bwUsage = make(map[string]int64) 
+	bwUsage = make(map[string]int64)
 )
 
 func addBytes(subdomain string, n int64) {
@@ -99,7 +99,7 @@ func main() {
 
 	go startControlServer()
 
-	// Admin UI Server
+	// Admin UI Server (Port 3050)
 	go func() {
 		mux := http.NewServeMux()
 		mux.HandleFunc("/", basicAuth(adminDashboardHandler))
@@ -115,11 +115,25 @@ func main() {
 		}
 	}()
 
-	// HTTP Tunnel Proxy
+	// HTTP Tunnel Proxy & Landing Page (Port 8080)
 	go func() {
 		mux := http.NewServeMux()
 		mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+			
+			// 1. Handle Public Root Domain Traffic (Landing Page & APIs)
 			if r.Host == "tun.robotservice.eu.org" {
+				
+				// --- Razorpay Automated Checkout APIs ---
+				if r.URL.Path == "/api/create-order" {
+					createOrderHandler(w, r)
+					return
+				}
+				if r.URL.Path == "/api/verify-payment" {
+					verifyPaymentHandler(w, r)
+					return
+				}
+
+				// --- Standard Landing Page ---
 				tmpl, err := template.ParseFiles("templates/index.html")
 				if err != nil {
 					http.Error(w, "Landing page error.", http.StatusInternalServerError)
@@ -129,6 +143,7 @@ func main() {
 				return
 			}
 
+			// 2. Handle Subdomain Traffic (The actual HTTP Tunnels)
 			hostParts := strings.Split(r.Host, ".")
 			subdomain := hostParts[0]
 
@@ -159,7 +174,7 @@ func main() {
 			proxy.ServeHTTP(w, r)
 		})
 		
-		log.Println("Starting HTTP Tunnel Proxy on port :8080...")
+		log.Println("Starting HTTP Tunnel Proxy & Web Server on port :8080...")
 		if err := http.ListenAndServe(":8080", mux); err != nil {
 			log.Fatalf("Tunnel Proxy failed: %v", err)
 		}
