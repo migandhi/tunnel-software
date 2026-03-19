@@ -133,6 +133,11 @@ func main() {
 					return
 				}
 
+				if r.URL.Path == "/api/verify-renewal" { // <--- ADD THIS BLOCK
+					verifyRenewalHandler(w, r)
+					return
+				}
+
 				// --- Standard Landing Page ---
 				tmpl, err := template.ParseFiles("templates/index.html")
 				if err != nil {

@@ -9,9 +9,8 @@
         .hero { background-color: #1a1a2e; color: #fff; padding: 60px 20px; text-align: center; }
         .hero h1 { margin: 0; font-size: 2.5em; color: #4facfe; }
         .hero p { font-size: 1.2em; color: #d1d1e9; max-width: 600px; margin: 15px auto; line-height: 1.5; }
-        .container { max-width: 900px; margin: 40px auto; padding: 0 20px; }
+        .container { max-width: 900px; margin: 40px auto; padding: 0 20px; padding-bottom: 40px; }
         
-        /* Checkout Box Styles */
         .checkout-box { background: #fff; border-radius: 12px; padding: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); max-width: 500px; margin: 0 auto; text-align: center; }
         .checkout-box h2 { margin-top: 0; color: #1a1a2e; }
         .checkout-box p { color: #666; font-size: 14px; margin-bottom: 20px; }
@@ -19,13 +18,11 @@
         .input-group label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 5px; color: #444; }
         .input-group input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 14px; }
         
-        /* Buttons */
         .btn-basic { background: #28a745; color: white; width: 100%; padding: 14px; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; margin-bottom: 15px; transition: background 0.2s; }
         .btn-basic:hover { background: #218838; }
         .btn-pro { background: #007bff; color: white; width: 100%; padding: 14px; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; margin-bottom: 15px; transition: background 0.2s; }
         .btn-pro:hover { background: #0069d9; }
         
-        /* Success Screen */
         .success-box { display: none; background: #d4edda; border: 2px solid #28a745; border-radius: 12px; padding: 30px; max-width: 600px; margin: 0 auto; color: #155724; }
         .success-box h2 { margin-top: 0; color: #155724; text-align: center; }
         .credentials-list { list-style: none; padding: 0; font-size: 16px; background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #c3e6cb; }
@@ -33,6 +30,9 @@
         .credentials-list li:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
         .code-block { background: #1a1a2e; color: #4facfe; padding: 12px; border-radius: 6px; font-family: monospace; display: block; margin-top: 10px; word-break: break-all; }
         .highlight { font-weight: bold; color: #d9534f; }
+
+        .support-footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; text-align: center; color: #555; font-size: 14px; }
+        .support-footer a { color: #007bff; text-decoration: none; font-weight: bold; }
     </style>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </head>
@@ -50,12 +50,12 @@
             <p>Enter your details below to get your secure tunnel credentials instantly.</p>
             
             <div class="input-group">
-                <label for="customer-email">Email Address</label>
+                <label>Email Address</label>
                 <input type="email" id="customer-email" placeholder="you@example.com" required>
             </div>
             
             <div class="input-group">
-                <label for="customer-subdomain">Desired Subdomain</label>
+                <label>Desired Subdomain</label>
                 <input type="text" id="customer-subdomain" placeholder="e.g. myapp (becomes myapp.tun.robotservice.eu.org)" required>
             </div>
             
@@ -68,15 +68,23 @@
                 Buy Pro IT & Gaming Plan (₹199 / 30 Days)<br>
                 <span style="font-size: 12px; font-weight: normal;">HTTP/HTTPS + 1 Dedicated TCP Port + Unlimited</span>
             </button>
+        </div>
 
-            <p style="margin-top: 20px; font-size: 13px;">
-                Or <a href="https://wa.me/917567365118?text=Hi Murtaza, I want to buy a GoTunnel plan manually." target="_blank" style="color: #007bff; text-decoration: none; font-weight: bold;">Chat on WhatsApp to pay manually</a>.
-            </p>
+        <div id="renewal-checkout-box" class="checkout-box" style="margin-top: 30px; border: 2px dashed #007bff; background: #fafafa;">
+            <h2>Renew / Top-Up Data</h2>
+            <p>Running low on bandwidth or expired? Enter your existing subdomain to top-up for another 30 days.</p>
+            
+            <div class="input-group">
+                <input type="text" id="renew-subdomain" placeholder="Your existing subdomain (e.g. myapp)" required>
+            </div>
+            
+            <button class="btn-basic" onclick="startRenewal('basic')">Renew Web Plan (₹99)</button>
+            <button class="btn-pro" onclick="startRenewal('pro')">Renew Pro Plan (₹199)</button>
         </div>
 
         <div id="success-screen" class="success-box">
-            <h2>🎉 Payment Successful!</h2>
-            <p style="text-align: center; margin-bottom: 20px;">Your GoTunnel is ready. Please copy and save these details immediately:</p>
+            <h2 id="success-title">🎉 Payment Successful!</h2>
+            <p id="success-message" style="text-align: center; margin-bottom: 20px;">Your GoTunnel is ready. Please copy and save these details immediately:</p>
             
             <ul class="credentials-list">
                 <li><b>Secure Token:</b> <span id="out-token" style="font-family: monospace; font-size: 1.1em; font-weight: bold;"></span></li>
@@ -92,21 +100,22 @@
                 <span class="code-block">tunnel-client.exe --token <span id="out-token-cmd-tcp"></span> --local-tcp 25565</span>
                 <p style="margin-top: 5px; font-size: 13px; color: #555;">(The public will connect to your server at: <b>tun.robotservice.eu.org:<span id="out-public-port"></span></b>)</p>
             </div>
-            
-            <p style="margin-top: 15px; font-size: 13px; color: #555;">(Download the client from <a href="/downloads/">here</a> if you haven't already. Replace 8000/25565 with your local application's port).</p>
+        </div>
+
+        <div class="support-footer">
+            <p><strong>Need Help or Manual Setup?</strong></p>
+            <p>Email: <a href="mailto:murtaza.i.gandhi@gmail.com">murtaza.i.gandhi@gmail.com</a></p>
+            <p>WhatsApp Support: <a href="https://wa.me/917567365118?text=Hi Murtaza, I need help with GoTunnel Pro." target="_blank" style="color: #28a745;">+91 75673 65118</a></p>
         </div>
 
     </div>
 
     <script>
+    // 1. NEW USER CHECKOUT LOGIC
     async function startCheckout(plan) {
         const email = document.getElementById('customer-email').value;
         const sub = document.getElementById('customer-subdomain').value;
-        
-        if (!email || !sub) {
-            alert("Please enter both your email address and a desired subdomain.");
-            return;
-        }
+        if (!email || !sub) { alert("Please enter both your email address and a desired subdomain."); return; }
 
         const buttons = document.querySelectorAll('button');
         buttons.forEach(b => b.disabled = true);
@@ -115,43 +124,113 @@
             const orderRes = await fetch('/api/create-order', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ plan: plan, email: email, requested_subdomain: sub })
+                body: JSON.stringify({ plan: plan, email: email, requested_subdomain: sub, is_renewal: false }) // Flag added
             });
+            
+            // Handle duplicate subdomain error gracefully
+            if (!orderRes.ok) {
+                const errorMsg = await orderRes.text();
+                alert(errorMsg); 
+                buttons.forEach(b => b.disabled = false);
+                return; 
+            }
+
             const order = await orderRes.json();
 
             var options = {
-                "key": "rzp_test_SSdvB4Ueqi8GYZ", // <--- PASTE YOUR TEST KEY ID HERE!!!
+                "key": "rzp_live_SSdMtB9PhWduKy", // Your Test Key ID
                 "amount": order.amount,
                 "currency": "INR",
                 "name": "GoTunnel Pro",
-                "description": plan === 'pro' ? "Pro IT & Gaming Plan (30 Days)" : "Web Developer Plan (30 Days)",
+                "description": plan === 'pro' ? "Pro IT & Gaming Plan" : "Web Developer Plan",
                 "order_id": order.id,
+                "config": { "display": { "preferences": { "show_default_blocks": false }, "sequence": ["block.upi", "block.card"], "blocks": { "upi": { "name": "Pay using UPI", "instruments": [{ "method": "upi" }] }, "card": { "name": "Pay using Card", "instruments": [{ "method": "card" }] } } } },
                 "handler": async function (response) {
-                    
                     const verifyRes = await fetch('/api/verify-payment', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            razorpay_order_id: response.razorpay_order_id,
-                            razorpay_payment_id: response.razorpay_payment_id,
-                            razorpay_signature: response.razorpay_signature,
-                            plan: plan,
-                            email: email,
-                            requested_subdomain: sub
-                        })
+                        method: 'POST', headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ razorpay_order_id: response.razorpay_order_id, razorpay_payment_id: response.razorpay_payment_id, razorpay_signature: response.razorpay_signature, plan: plan, email: email, requested_subdomain: sub })
+                    });
+                    const result = await verifyRes.json();
+                    
+                    if (result.status === "success") {
+                        document.getElementById('automated-checkout-box').style.display = 'none';
+                        document.getElementById('renewal-checkout-box').style.display = 'none';
+                        document.getElementById('success-screen').style.display = 'block';
+                        document.getElementById('out-token').innerText = result.token;
+                        document.getElementById('out-token-cmd-http').innerText = result.token;
+                        document.getElementById('out-subdomain').innerText = result.subdomain;
+                        if (result.tcp_port > 0) {
+                            document.getElementById('out-port').innerText = result.tcp_port;
+                            document.getElementById('out-public-port').innerText = result.tcp_port;
+                            document.getElementById('out-token-cmd-tcp').innerText = result.token;
+                            document.getElementById('tcp-instructions').style.display = 'block';
+                        } else {
+                            document.getElementById('out-port').innerText = "N/A (Web Plan Only)";
+                        }
+                    } else { alert("Payment verification failed! Please contact support."); }
+                },
+                "prefill": { "email": email }, "theme": { "color": "#1a1a2e" },
+                "modal": { ondismiss: function(){ buttons.forEach(b => b.disabled = false); } }
+            };
+            var rzp1 = new Razorpay(options);
+            rzp1.on('payment.failed', function (response){ alert("Payment Failed."); buttons.forEach(b => b.disabled = false); });
+            rzp1.open();
+        } catch (err) { alert("Error connecting to server."); buttons.forEach(b => b.disabled = false); }
+    }
+
+    // 2. RENEWAL CHECKOUT LOGIC
+    async function startRenewal(plan) {
+        const sub = document.getElementById('renew-subdomain').value.trim();
+        if (!sub) { alert("Please enter your existing subdomain to renew."); return; }
+
+        const userAgreed = confirm("⚠️ WARNING: Renewing now will immediately restart your 30-day cycle and reset your data quota. Any unused bandwidth from your current cycle will be lost.\n\nDo you wish to proceed with the Top-Up?");
+        if (!userAgreed) return;
+
+        const buttons = document.querySelectorAll('button');
+        buttons.forEach(b => b.disabled = true);
+
+        try {
+            const orderRes = await fetch('/api/create-order', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ plan: plan, email: "renew@user.com", requested_subdomain: sub, is_renewal: true }) // Flag added
+            });
+            
+            // Handle missing subdomain error gracefully
+            if (!orderRes.ok) {
+                const errorMsg = await orderRes.text();
+                alert(errorMsg); 
+                buttons.forEach(b => b.disabled = false);
+                return; 
+            }
+
+            const order = await orderRes.json();
+
+            var options = {
+                "key": "rzp_live_SSdMtB9PhWduKy", // Your Test Key ID
+                "amount": order.amount, "currency": "INR", "name": "GoTunnel Pro Renewal",
+                "description": plan === 'pro' ? "Pro Plan Top-Up" : "Web Plan Top-Up", "order_id": order.id,
+                "config": { "display": { "preferences": { "show_default_blocks": false }, "sequence": ["block.upi", "block.card"], "blocks": { "upi": { "name": "Pay using UPI", "instruments": [{ "method": "upi" }] }, "card": { "name": "Pay using Card", "instruments": [{ "method": "card" }] } } } },
+                "handler": async function (response) {
+                    const verifyRes = await fetch('/api/verify-renewal', {
+                        method: 'POST', headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ razorpay_order_id: response.razorpay_order_id, razorpay_payment_id: response.razorpay_payment_id, razorpay_signature: response.razorpay_signature, plan: plan, subdomain: sub })
                     });
                     
                     const result = await verifyRes.json();
                     
                     if (result.status === "success") {
                         document.getElementById('automated-checkout-box').style.display = 'none';
+                        document.getElementById('renewal-checkout-box').style.display = 'none';
+                        
+                        document.getElementById('success-title').innerText = "✅ Top-Up Successful!";
+                        document.getElementById('success-message').innerText = "Your data quota has been reset and 30 days added. Here are your current active details:";
+
                         document.getElementById('success-screen').style.display = 'block';
                         
                         document.getElementById('out-token').innerText = result.token;
                         document.getElementById('out-token-cmd-http').innerText = result.token;
                         document.getElementById('out-subdomain').innerText = result.subdomain;
                         
-                        // Check if they got a TCP Port, show the instructions if they did
                         if (result.tcp_port > 0) {
                             document.getElementById('out-port').innerText = result.tcp_port;
                             document.getElementById('out-public-port').innerText = result.tcp_port;
@@ -161,31 +240,15 @@
                             document.getElementById('out-port').innerText = "N/A (Web Plan Only)";
                             document.getElementById('tcp-instructions').style.display = 'none';
                         }
-
-                    } else {
-                        alert("Payment verification failed! Please contact support.");
-                    }
+                    } else { alert("Payment verification failed! Please contact support."); }
                 },
-                "prefill": { "email": email },
                 "theme": { "color": "#1a1a2e" },
-                "modal": {
-                    "ondismiss": function(){
-                        buttons.forEach(b => b.disabled = false);
-                    }
-                }
+                "modal": { ondismiss: function(){ buttons.forEach(b => b.disabled = false); } }
             };
-            
             var rzp1 = new Razorpay(options);
-            rzp1.on('payment.failed', function (response){
-                alert("Payment Failed. Reason: " + response.error.description);
-                buttons.forEach(b => b.disabled = false);
-            });
+            rzp1.on('payment.failed', function (response){ alert("Payment Failed."); buttons.forEach(b => b.disabled = false); });
             rzp1.open();
-
-        } catch (err) {
-            alert("Error connecting to server. Please try again later.");
-            buttons.forEach(b => b.disabled = false);
-        }
+        } catch (err) { alert("Error connecting to server."); buttons.forEach(b => b.disabled = false); }
     }
     </script>
 </body>
