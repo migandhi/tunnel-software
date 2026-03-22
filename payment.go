@@ -14,8 +14,8 @@ import (
 )
 
 // --- PASTE YOUR TEST KEYS HERE ---
-const RazorpayKeyID = "rzp_live_SSdMtB9PhWduKy"
-const RazorpaySecret = "U4oxxCp4xeRlOFWYPWHFffGV"
+const RazorpayKeyID = "rzp_test_SSdvB4Ueqi8GYZ"
+const RazorpaySecret = "51gblw9D9m13gA9NIhldGWCQ"
 
 // --- DATA STRUCTURES ---
 

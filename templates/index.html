@@ -23,13 +23,27 @@
         .btn-pro { background: #007bff; color: white; width: 100%; padding: 14px; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; margin-bottom: 15px; transition: background 0.2s; }
         .btn-pro:hover { background: #0069d9; }
         
-        .success-box { display: none; background: #d4edda; border: 2px solid #28a745; border-radius: 12px; padding: 30px; max-width: 600px; margin: 0 auto; color: #155724; }
+        .success-box { display: none; background: #d4edda; border: 2px solid #28a745; border-radius: 12px; padding: 30px; max-width: 650px; margin: 0 auto; color: #155724; }
         .success-box h2 { margin-top: 0; color: #155724; text-align: center; }
         .credentials-list { list-style: none; padding: 0; font-size: 16px; background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #c3e6cb; }
         .credentials-list li { margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
         .credentials-list li:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
         .code-block { background: #1a1a2e; color: #4facfe; padding: 12px; border-radius: 6px; font-family: monospace; display: block; margin-top: 10px; word-break: break-all; }
         .highlight { font-weight: bold; color: #d9534f; }
+
+        .download-section { margin-top: 30px; padding-top: 25px; border-top: 2px dashed #a3c9ae; }
+        .download-section h3 { margin-top: 0; color: #155724; font-size: 18px; text-align: center; margin-bottom: 5px; }
+        .os-cards { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
+        .os-card { background: #fff; border: 1px solid #28a745; border-radius: 8px; padding: 15px 10px; width: 160px; text-align: center; text-decoration: none; color: #333; transition: all 0.2s ease-in-out; }
+        .os-card:hover { background: #e8f5e9; transform: translateY(-3px); box-shadow: 0 6px 12px rgba(40,167,69,0.15); }
+        .os-icon { font-size: 28px; margin-bottom: 8px; display: block; }
+        .os-name { font-weight: bold; font-size: 15px; margin-bottom: 6px; color: #155724; }
+        .os-arch { font-size: 12px; color: #555; line-height: 1.4; }
+        
+        /* Terminal Snippet Box */
+        .terminal-box { background: #fff; border: 1px solid #c3e6cb; border-radius: 6px; padding: 15px; margin-top: 20px; font-size: 13px; color: #333; text-align: left; }
+        .terminal-box h4 { margin-top: 0; margin-bottom: 10px; color: #155724; }
+        .terminal-cmd { background: #eee; padding: 6px 10px; border-radius: 4px; display: block; margin-bottom: 8px; font-family: monospace; color: #d9534f; font-weight: bold;}
 
         .support-footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; text-align: center; color: #555; font-size: 14px; }
         .support-footer a { color: #007bff; text-decoration: none; font-weight: bold; }
@@ -94,12 +108,50 @@
             
             <p style="margin-top: 20px; font-weight: bold;">How to start your HTTP web tunnel:</p>
             <span class="code-block">tunnel-client.exe --token <span id="out-token-cmd-http"></span> --local-http 8000</span>
+            <p style="margin-top: 5px; font-size: 12px; color: #555;">(Replace 8000 with your local application's actual port).</p>
             
             <div id="tcp-instructions" style="display: none;">
                 <p style="margin-top: 15px; font-weight: bold;">How to start your TCP tunnel (Games, SSH, Databases):</p>
                 <span class="code-block">tunnel-client.exe --token <span id="out-token-cmd-tcp"></span> --local-tcp 25565</span>
                 <p style="margin-top: 5px; font-size: 13px; color: #555;">(The public will connect to your server at: <b>tun.robotservice.eu.org:<span id="out-public-port"></span></b>)</p>
             </div>
+
+            <div class="download-section">
+                <h3>📥 Download the Client</h3>
+                <p style="text-align: center; font-size: 13px; margin: 0; color: #555;">Click directly to download, or use the terminal commands below.</p>
+                
+                <div class="os-cards">
+                    <a href="https://admin.tun.robotservice.eu.org/downloads/tunnel-client.exe" download class="os-card">
+                        <span class="os-icon">🪟</span>
+                        <div class="os-name">Windows</div>
+                        <div class="os-arch">Click to Download .exe</div>
+                    </a>
+                    <a href="https://admin.tun.robotservice.eu.org/downloads/tunnel-client-mac" download class="os-card">
+                        <span class="os-icon">🍏</span>
+                        <div class="os-name">macOS</div>
+                        <div class="os-arch">Intel & M-Series</div>
+                    </a>
+                    <a href="https://admin.tun.robotservice.eu.org/downloads/tunnel-client-linux" download class="os-card">
+                        <span class="os-icon">🐧</span>
+                        <div class="os-name">Linux</div>
+                        <div class="os-arch">AMD64 & ARM64</div>
+                    </a>
+                </div>
+
+                <div class="terminal-box">
+                    <h4>For Mac & Linux Users (Recommended Method)</h4>
+                    <p style="margin-top:0; margin-bottom:10px;">Open your terminal and run these commands to download the client and make it executable:</p>
+                    
+                    <b>macOS Terminal:</b>
+                    <span class="terminal-cmd">curl -O https://admin.tun.robotservice.eu.org/downloads/tunnel-client-mac<br>chmod +x tunnel-client-mac</span>
+                    
+                    <b>Linux Terminal:</b>
+                    <span class="terminal-cmd">wget https://admin.tun.robotservice.eu.org/downloads/tunnel-client-linux<br>chmod +x tunnel-client-linux</span>
+                    
+                    <p style="margin-top:8px; margin-bottom:0; font-style: italic; color:#555;">Note: After making it executable, run the client using <code>./tunnel-client-mac</code> or <code>./tunnel-client-linux</code> instead of <code>tunnel-client.exe</code>.</p>
+                </div>
+            </div>
+
         </div>
 
         <div class="support-footer">
@@ -124,10 +176,9 @@
             const orderRes = await fetch('/api/create-order', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ plan: plan, email: email, requested_subdomain: sub, is_renewal: false }) // Flag added
+                body: JSON.stringify({ plan: plan, email: email, requested_subdomain: sub, is_renewal: false })
             });
             
-            // Handle duplicate subdomain error gracefully
             if (!orderRes.ok) {
                 const errorMsg = await orderRes.text();
                 alert(errorMsg); 
@@ -138,7 +189,7 @@
             const order = await orderRes.json();
 
             var options = {
-                "key": "rzp_live_SSdMtB9PhWduKy", // Your Test Key ID
+                "key": "rzp_test_SSdvB4Ueqi8GYZ",
                 "amount": order.amount,
                 "currency": "INR",
                 "name": "GoTunnel Pro",
@@ -192,10 +243,9 @@
         try {
             const orderRes = await fetch('/api/create-order', {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ plan: plan, email: "renew@user.com", requested_subdomain: sub, is_renewal: true }) // Flag added
+                body: JSON.stringify({ plan: plan, email: "renew@user.com", requested_subdomain: sub, is_renewal: true })
             });
             
-            // Handle missing subdomain error gracefully
             if (!orderRes.ok) {
                 const errorMsg = await orderRes.text();
                 alert(errorMsg); 
@@ -206,7 +256,7 @@
             const order = await orderRes.json();
 
             var options = {
-                "key": "rzp_live_SSdMtB9PhWduKy", // Your Test Key ID
+                "key": "rzp_test_SSdvB4Ueqi8GYZ",
                 "amount": order.amount, "currency": "INR", "name": "GoTunnel Pro Renewal",
                 "description": plan === 'pro' ? "Pro Plan Top-Up" : "Web Plan Top-Up", "order_id": order.id,
                 "config": { "display": { "preferences": { "show_default_blocks": false }, "sequence": ["block.upi", "block.card"], "blocks": { "upi": { "name": "Pay using UPI", "instruments": [{ "method": "upi" }] }, "card": { "name": "Pay using Card", "instruments": [{ "method": "card" }] } } } },

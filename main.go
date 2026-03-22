@@ -16,11 +16,14 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
+
+
+// GLOBAL VARIABLES FOR TUNNEL ROUTING
 var (
 	db                *sql.DB
+	tunnelMutex       sync.RWMutex
 	activeHttpTunnels = make(map[string]*yamux.Session)
 	activeTcpTunnels  = make(map[string]*yamux.Session)
-	tunnelMutex       sync.RWMutex
 )
 
 // --- BANDWIDTH TRACKER ---
